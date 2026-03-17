@@ -1,0 +1,11 @@
+{
+    "mcpServers": {
+        "laravel-boost": {
+            "command": "C:\\php\\php.exe",
+            "args": [
+                "C:\\Users\\WebProg\\Desktop\\enc-roster-creator\\backend\\artisan",
+                "boost:mcp"
+            ]
+        }
+    }
+}

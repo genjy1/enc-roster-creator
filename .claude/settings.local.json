@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(docker compose:*)",
+      "Bash(ls \"C:\\\\Users\\\\WebProg\\\\Desktop\\\\enc-roster-creator\\\\backend\\\\routes\"\" && cat \"C:UsersWebProgDesktopenc-roster-creatorbackendbootstrapapp.php \")",
+      "Bash(curl -s http://localhost/api/countries)",
+      "Bash(vendor/bin/pint database/migrations/2026_03_17_121302_create_players_table.php --format agent)",
+      "Bash(python -m json.tool)",
+      "Bash(\"C:/Users/WebProg/Desktop/enc-roster-creator/backend/.env.example\")"
+    ]
+  }
+}

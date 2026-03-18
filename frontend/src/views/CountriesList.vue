@@ -31,6 +31,7 @@
 
         <!-- Players -->
         <div v-show="openIds.has(country.id)" class="border-t border-border px-5 py-4">
+
           <div
             v-if="country.players?.length"
             class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-2"
@@ -51,7 +52,7 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { ChevronDownIcon } from '@heroicons/vue/24/outline'
 import type { Country } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
@@ -59,13 +60,13 @@ import { useApi } from '@/composables/useApi'
 const { loading, error, apiFetch } = useApi()
 
 const countries = ref<Country[]>([])
-const openIds = ref<Set<number>>(new Set())
+const openIds = reactive(new Set<number>())
 
 function toggle(id: number): void {
-  if (openIds.value.has(id)) {
-    openIds.value.delete(id)
+  if (openIds.has(id)) {
+    openIds.delete(id)
   } else {
-    openIds.value.add(id)
+    openIds.add(id)
   }
 }
 

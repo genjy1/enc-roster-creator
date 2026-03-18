@@ -30,7 +30,9 @@
             <span :class="['fi', 'fi-' + roster.code.toLowerCase(), 'text-2xl']" />
             <div>
               <p class="font-bold text-lg">{{ roster.name }}</p>
-              <p class="text-xs text-gray-500">{{ roster.players.length }} игрок{{ suffix(roster.players.length) }}</p>
+              <p class="text-xs text-gray-500">
+                {{ roster.players.length }} игрок{{ playerSuffix(roster.players.length) }}
+              </p>
             </div>
           </div>
           <RouterLink
@@ -48,7 +50,9 @@
             :key="player.id"
             class="flex flex-col items-center gap-1.5 text-center"
           >
-            <div class="w-14 h-14 rounded-full overflow-hidden bg-surface border border-border shrink-0">
+            <div
+              class="w-14 h-14 rounded-full overflow-hidden bg-surface border border-border shrink-0"
+            >
               <img
                 :src="resolvePhoto(player.photo_url)"
                 :alt="player.nickname"
@@ -68,28 +72,13 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import type { Player } from '@/types/Api'
+import type { RosterGroup } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
 import { resolvePhoto } from '@/utils/resolvePhoto'
-
-interface RosterGroup {
-  id: number
-  name: string
-  code: string
-  players: Player[]
-}
+import { playerSuffix } from '@/utils/pluralRu'
 
 const { loading, error, apiFetch } = useApi()
 const rosters = ref<RosterGroup[]>([])
-
-function suffix(n: number): string {
-  const mod10 = n % 10
-  const mod100 = n % 100
-  if (mod100 >= 11 && mod100 <= 14) return 'ов'
-  if (mod10 === 1) return ''
-  if (mod10 >= 2 && mod10 <= 4) return 'а'
-  return 'ов'
-}
 
 onMounted(async () => {
   rosters.value = (await apiFetch<RosterGroup[]>('/api/rosters')) ?? []

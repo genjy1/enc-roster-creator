@@ -13,11 +13,11 @@
 
     <!-- Filters -->
     <div class="flex flex-wrap gap-3 mb-8 p-4 bg-card border border-border rounded-xl">
-      <input
+      <UniversalInput
         v-model="search"
         type="search"
         placeholder="Поиск по никнейму или имени…"
-        class="bg-surface-2 border border-border text-gray-200 placeholder-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand/50 w-72 transition-all"
+        class="w-72"
       />
       <AppSelect
         v-model="positionFilter"
@@ -52,12 +52,15 @@
             class="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
           />
           <!-- Bottom gradient overlay -->
-          <div class="absolute inset-x-0 bottom-0 h-1/2" style="background: linear-gradient(to top, #161a1f, transparent)" />
+          <div
+            class="absolute inset-x-0 bottom-0 h-1/2"
+            style="background: linear-gradient(to top, #161a1f, transparent)"
+          />
           <!-- Flag badge -->
           <span
             v-if="player.country_code"
             :class="['fi', 'fi-' + player.country_code.toLowerCase(), 'absolute top-2 right-2 rounded shadow-lg text-base']"
-            :title="player.country_name"
+            :title="player.country_name ?? undefined"
           />
         </div>
 
@@ -83,39 +86,17 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import type { Player } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
 import { resolvePhoto } from '@/utils/resolvePhoto'
+import { positionBadge } from '@/utils/positionBadge'
 import AppSelect from '@/components/AppSelect.vue'
 import type { SelectOption } from '@/components/AppSelect.vue'
-
-interface PlayerRow {
-  id: number
-  nickname: string
-  name: string
-  surname: string
-  date_of_birth: string
-  position: string
-  photo_url: string | null
-  country_code: string | null
-  country_name: string | undefined
-}
-
-const BADGE_MAP: Record<string, string> = {
-  'AWPer':         'badge-awper',
-  'IGL':           'badge-igl',
-  'Support':       'badge-support',
-  'Lurker':        'badge-lurker',
-  'Entry Fragger': 'badge-entry',
-  'Rifler':        'badge-rifler',
-}
-
-function positionBadge(pos: string): string {
-  return BADGE_MAP[pos] ?? 'badge-rifler'
-}
+import UniversalInput from '@/components/UniversalInput.vue'
 
 const { loading, error, apiFetch } = useApi()
 
-const players = ref<PlayerRow[]>([])
+const players = ref<Player[]>([])
 const search = ref('')
 const positionFilter = ref('')
 
@@ -125,7 +106,7 @@ const positionOptions = computed<SelectOption[]>(() =>
     .map((p) => ({ value: p, label: p })),
 )
 
-const filtered = computed<PlayerRow[]>(() => {
+const filtered = computed<Player[]>(() => {
   const q = search.value.toLowerCase()
   return players.value.filter((p) => {
     const matchesSearch =
@@ -139,6 +120,6 @@ const filtered = computed<PlayerRow[]>(() => {
 })
 
 onMounted(async () => {
-  players.value = (await apiFetch<PlayerRow[]>('/api/players')) ?? []
+  players.value = (await apiFetch<Player[]>('/api/players')) ?? []
 })
 </script>

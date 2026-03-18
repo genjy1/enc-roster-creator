@@ -76,7 +76,7 @@
               <div class="leading-tight">
                 <p class="text-sm font-bold text-white">{{ selectedCountry.name }}</p>
                 <p class="text-xs text-gray-500">
-                  {{ countryPlayers.length }}&nbsp;игрок{{ countryPlayers.length === 1 ? '' : countryPlayers.length <= 4 ? 'а' : 'ов' }}
+                  {{ countryPlayers.length }}&nbsp;игрок{{ playerSuffix(countryPlayers.length) }}
                 </p>
               </div>
             </div>
@@ -223,6 +223,7 @@ import { computed, onMounted, ref } from 'vue'
 import type { Country, Player } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
 import { resolvePhoto } from '@/utils/resolvePhoto'
+import { playerSuffix } from '@/utils/pluralRu'
 import PlayerCard from '@/components/PlayerCard.vue'
 import AppSelect from '@/components/AppSelect.vue'
 import type { SelectOption } from '@/components/AppSelect.vue'
@@ -283,14 +284,7 @@ async function saveRoster(): Promise<void> {
   }
 }
 
-const rosterSuffix = computed<string>(() => {
-  const n = roster.value.length % 10
-  const n100 = roster.value.length % 100
-  if (n100 >= 11 && n100 <= 14) return 'ов'
-  if (n === 1) return ''
-  if (n >= 2 && n <= 4) return 'а'
-  return 'ов'
-})
+const rosterSuffix = computed(() => playerSuffix(roster.value.length))
 
 onMounted(async () => {
   countries.value = (await apiFetch<Country[]>('/api/countries')) ?? []

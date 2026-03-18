@@ -82,7 +82,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, ref, watch } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 import { onClickOutside } from '@vueuse/core'
 import { CheckIcon, ChevronDownIcon } from '@heroicons/vue/24/solid'
 
@@ -130,20 +130,17 @@ function toggle(): void {
   }
 }
 
-function select(value: string): void {
-  emit('update:modelValue', value)
+function closeDropdown(): void {
   open.value = false
   query.value = ''
 }
 
-onClickOutside(rootEl, () => {
-  open.value = false
-  query.value = ''
-})
+function select(value: string): void {
+  emit('update:modelValue', value)
+  closeDropdown()
+}
 
-watch(open, (val) => {
-  if (!val) query.value = ''
-})
+onClickOutside(rootEl, closeDropdown)
 </script>
 
 <style scoped>

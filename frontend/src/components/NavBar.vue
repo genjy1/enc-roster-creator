@@ -1,9 +1,14 @@
 <template>
-  <header class="sticky top-0 z-50 backdrop-blur-xl border-b border-border/60" style="background: rgb(12 13 15 / 0.85)">
+  <header
+    class="sticky top-0 z-50 backdrop-blur-xl border-b border-border/60"
+    style="background: rgb(12 13 15 / 0.85)"
+  >
     <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
       <!-- Logo -->
       <RouterLink to="/" class="flex items-center gap-2 group">
-        <div class="w-7 h-7 rounded-md bg-brand flex items-center justify-center text-black font-black text-xs leading-none glow-brand-sm transition-all group-hover:scale-110">
+        <div
+          class="w-7 h-7 rounded-md bg-brand flex items-center justify-center text-black font-black text-xs leading-none glow-brand-sm transition-all group-hover:scale-110"
+        >
           EC
         </div>
         <span class="font-black text-lg tracking-widest uppercase text-gradient">ENC</span>

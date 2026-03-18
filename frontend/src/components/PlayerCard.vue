@@ -65,15 +65,7 @@ import { computed } from 'vue'
 import { CheckIcon } from '@heroicons/vue/24/solid'
 import type { Player } from '@/types/Api'
 import { resolvePhoto } from '@/utils/resolvePhoto'
-
-const BADGE_MAP: Record<string, string> = {
-  'AWPer':         'badge-awper',
-  'IGL':           'badge-igl',
-  'Support':       'badge-support',
-  'Lurker':        'badge-lurker',
-  'Entry Fragger': 'badge-entry',
-  'Rifler':        'badge-rifler',
-}
+import { positionBadge as getBadge } from '@/utils/positionBadge'
 
 const props = defineProps<{
   player: Player
@@ -84,5 +76,5 @@ const emit = defineEmits<{
   toggle: [player: Player]
 }>()
 
-const positionBadge = computed(() => BADGE_MAP[props.player.position] ?? 'badge-rifler')
+const positionBadge = computed(() => getBadge(props.player.position))
 </script>

@@ -1,20 +1,93 @@
-@import "tailwindcss";
-@import "flag-icons/css/flag-icons.min.css";
+@import 'tailwindcss';
+@import 'flag-icons/css/flag-icons.min.css';
 
 @theme {
   --color-brand: #f4971a;
   --color-brand-hover: #e08610;
-  --color-surface: #141517;
-  --color-card: #1e2023;
-  --color-border: #2a2d31;
+  --color-brand-dim: rgb(244 151 26 / 0.1);
+  --color-brand-glow: rgb(244 151 26 / 0.3);
+  --color-surface: #0c0d0f;
+  --color-surface-2: #111316;
+  --color-card: #161a1f;
+  --color-card-hover: #1c2128;
+  --color-border: #252a30;
+  --color-border-bright: #363d46;
 }
 
 @layer base {
-  html, body {
+  html,
+  body {
     @apply bg-surface text-gray-200 antialiased min-h-screen;
+    font-family: 'Noto Sans', 'Inter', system-ui, sans-serif;
+    font-optical-sizing: auto;
   }
 
   a {
     @apply transition-colors duration-150;
   }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #252a30 transparent;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(135deg, #f4971a 0%, #fbbf24 60%, #f97316 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .glow-brand {
+    box-shadow: 0 0 20px rgb(244 151 26 / 0.4), 0 0 60px rgb(244 151 26 / 0.15);
+  }
+
+  .glow-brand-sm {
+    box-shadow: 0 0 12px rgb(244 151 26 / 0.3), 0 0 24px rgb(244 151 26 / 0.1);
+  }
+
+  .grid-pattern {
+    background-image:
+      linear-gradient(rgb(37 42 48 / 0.5) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(37 42 48 / 0.5) 1px, transparent 1px);
+    background-size: 44px 44px;
+  }
+
+  .dot-pattern {
+    background-image: radial-gradient(circle, rgb(244 151 26 / 0.12) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+
+  .card-lift {
+    @apply transition-all duration-200 cursor-pointer;
+  }
+
+  .card-lift:hover {
+    background-color: var(--color-card-hover);
+    border-color: var(--color-border-bright);
+    transform: translateY(-3px);
+    box-shadow: 0 0 0 1px rgb(244 151 26 / 0.15), 0 12px 32px rgb(0 0 0 / 0.5);
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center gap-2 bg-brand hover:bg-brand-hover text-black font-bold px-5 py-2.5 rounded-lg transition-all duration-200;
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 20px rgb(244 151 26 / 0.45);
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center gap-2 border border-border text-gray-400 hover:text-white hover:border-border-bright font-semibold px-5 py-2.5 rounded-lg transition-all duration-200;
+  }
+
+  .badge-awper   { @apply bg-blue-500/10 text-blue-400 ring-1 ring-blue-500/20; }
+  .badge-igl     { @apply bg-purple-500/10 text-purple-400 ring-1 ring-purple-500/20; }
+  .badge-support { @apply bg-green-500/10 text-green-400 ring-1 ring-green-500/20; }
+  .badge-lurker  { @apply bg-yellow-500/10 text-yellow-400 ring-1 ring-yellow-500/20; }
+  .badge-entry   { @apply bg-red-500/10 text-red-400 ring-1 ring-red-500/20; }
+  .badge-rifler  { @apply bg-gray-500/10 text-gray-400 ring-1 ring-gray-500/20; }
 }

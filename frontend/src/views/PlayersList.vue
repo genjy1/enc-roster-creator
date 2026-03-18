@@ -1,30 +1,38 @@
 <template>
   <div class="max-w-7xl mx-auto px-6 py-10">
     <!-- Header -->
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold tracking-tight">Игроки</h1>
-      <span v-if="!loading" class="text-sm text-gray-500">{{ filtered.length }} игроков</span>
+    <div class="flex items-end justify-between mb-8">
+      <div>
+        <p class="text-xs text-brand font-semibold uppercase tracking-widest mb-1">База игроков</p>
+        <h1 class="text-4xl font-black tracking-tight">Игроки</h1>
+      </div>
+      <span v-if="!loading" class="text-sm text-gray-600 mb-1">
+        {{ filtered.length }} из {{ players.length }}
+      </span>
     </div>
 
     <!-- Filters -->
-    <div class="flex flex-wrap gap-3 mb-8">
+    <div class="flex flex-wrap gap-3 mb-8 p-4 bg-card border border-border rounded-xl">
       <input
         v-model="search"
         type="search"
         placeholder="Поиск по никнейму или имени…"
-        class="bg-card border border-border text-gray-200 placeholder-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand w-72"
+        class="bg-surface-2 border border-border text-gray-200 placeholder-gray-600 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50 focus:border-brand/50 w-72 transition-all"
       />
       <AppSelect
         v-model="positionFilter"
         :options="positionOptions"
         placeholder="Все позиции"
-        class="w-44"
+        class="w-48"
       />
     </div>
 
     <!-- Loading / Error -->
-    <div v-if="loading" class="text-gray-500">Загрузка...</div>
-    <div v-else-if="error" class="text-red-400">{{ error }}</div>
+    <div v-if="loading" class="flex items-center gap-3 text-gray-500 py-20 justify-center">
+      <span class="w-5 h-5 border-2 border-gray-700 border-t-brand rounded-full animate-spin" />
+      Загрузка игроков…
+    </div>
+    <div v-else-if="error" class="text-red-400 py-10 text-center">{{ error }}</div>
 
     <!-- Grid -->
     <ul
@@ -34,36 +42,42 @@
       <li
         v-for="player in filtered"
         :key="player.id"
-        class="bg-card border border-border rounded-xl overflow-hidden hover:border-brand/50 transition-colors"
+        class="bg-card border border-border rounded-xl overflow-hidden card-lift group"
       >
         <!-- Photo -->
-        <div class="aspect-square bg-surface overflow-hidden">
+        <div class="relative aspect-square bg-surface-2 overflow-hidden">
           <img
             :src="resolvePhoto(player.photo_url)"
             :alt="player.nickname"
-            class="w-full h-full object-cover object-top"
+            class="w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
+          />
+          <!-- Bottom gradient overlay -->
+          <div class="absolute inset-x-0 bottom-0 h-1/2" style="background: linear-gradient(to top, #161a1f, transparent)" />
+          <!-- Flag badge -->
+          <span
+            v-if="player.country_code"
+            :class="['fi', 'fi-' + player.country_code.toLowerCase(), 'absolute top-2 right-2 rounded shadow-lg text-base']"
+            :title="player.country_name"
           />
         </div>
 
         <!-- Info -->
-        <div class="p-3 flex flex-col gap-1">
-          <p class="font-bold text-brand truncate">{{ player.nickname }}</p>
-          <p class="text-xs text-gray-400 truncate">{{ player.name }} {{ player.surname }}</p>
-          <div class="flex items-center justify-between gap-1 mt-0.5">
-            <span class="text-xs bg-surface text-gray-500 rounded px-1.5 py-0.5 truncate">
-              {{ player.position }}
-            </span>
-            <span
-              v-if="player.country_code"
-              :class="['fi', 'fi-' + player.country_code.toLowerCase()]"
-              :title="player.country_name"
-            />
-          </div>
+        <div class="p-3 flex flex-col gap-1.5">
+          <p class="font-bold text-brand truncate text-sm">{{ player.nickname }}</p>
+          <p class="text-xs text-gray-500 truncate">{{ player.name }} {{ player.surname }}</p>
+          <span
+            :class="['text-xs font-medium px-2 py-0.5 rounded-full self-start', positionBadge(player.position)]"
+          >
+            {{ player.position }}
+          </span>
         </div>
       </li>
     </ul>
 
-    <p v-else class="text-gray-500">Игроки не найдены.</p>
+    <div v-else class="text-center py-20 text-gray-600">
+      <p class="text-4xl mb-3">🔍</p>
+      <p>Игроки не найдены</p>
+    </div>
   </div>
 </template>
 
@@ -84,6 +98,19 @@ interface PlayerRow {
   photo_url: string | null
   country_code: string | null
   country_name: string | undefined
+}
+
+const BADGE_MAP: Record<string, string> = {
+  'AWPer':         'badge-awper',
+  'IGL':           'badge-igl',
+  'Support':       'badge-support',
+  'Lurker':        'badge-lurker',
+  'Entry Fragger': 'badge-entry',
+  'Rifler':        'badge-rifler',
+}
+
+function positionBadge(pos: string): string {
+  return BADGE_MAP[pos] ?? 'badge-rifler'
 }
 
 const { loading, error, apiFetch } = useApi()

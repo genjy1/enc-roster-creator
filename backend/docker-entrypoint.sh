@@ -21,5 +21,12 @@ done
 # Миграции
 php artisan migrate --force
 
+# Laravel-кеш (только в production — ускоряет запросы)
+if [ "$APP_ENV" = "production" ]; then
+    php artisan config:cache
+    php artisan route:cache
+    php artisan view:cache
+fi
+
 # Передаём управление CMD (php-fpm)
 exec "$@"

@@ -203,7 +203,7 @@ class ImportHltvPlayers extends Command
 
     private function fetchLetter(string $letter, string $apiKey): string
     {
-        $targetUrl = self::BASE_URL.'?letter='.$letter;
+        $targetUrl = self::BASE_URL.'/'.$letter;
 
         $response = Http::timeout(60)
             ->get(self::SCRAPER_API_URL, [

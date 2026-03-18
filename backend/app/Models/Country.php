@@ -18,4 +18,9 @@ class Country extends Model
     {
         return $this->hasMany(Player::class, 'country_id');
     }
+
+    public function countryRosters(): HasMany
+    {
+        return $this->hasMany(CountryRoster::class, 'country_id');
+    }
 }

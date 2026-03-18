@@ -1,12 +1,12 @@
 <script setup lang="ts">
-
-import NavBar from './components/NavBar.vue';
-
+import NavBar from './components/NavBar.vue'
 </script>
 
 <template>
-  <NavBar />
-  <div class="container mx-auto w-4/5">
-    <RouterView />
+  <div class="flex flex-col min-h-screen bg-surface">
+    <NavBar />
+    <main class="flex-1">
+      <RouterView />
+    </main>
   </div>
 </template>

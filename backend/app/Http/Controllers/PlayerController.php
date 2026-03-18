@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Player;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class PlayerController extends Controller
@@ -10,9 +11,25 @@ class PlayerController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(): JsonResponse
     {
-        //
+        $players = Player::query()
+            ->with('country')
+            ->orderBy('nickname')
+            ->get()
+            ->map(fn (Player $player) => [
+                'id' => $player->id,
+                'nickname' => $player->nickname,
+                'name' => $player->name,
+                'surname' => $player->surname,
+                'date_of_birth' => $player->date_of_birth,
+                'position' => $player->position,
+                'photo_url' => $player->photo_url,
+                'country_code' => $player->country?->code,
+                'country_name' => $player->country?->name,
+            ]);
+
+        return response()->json(['data' => $players]);
     }
 
     /**

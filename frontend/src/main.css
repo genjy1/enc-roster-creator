@@ -1,1 +1,20 @@
 @import "tailwindcss";
+@import "flag-icons/css/flag-icons.min.css";
+
+@theme {
+  --color-brand: #f4971a;
+  --color-brand-hover: #e08610;
+  --color-surface: #141517;
+  --color-card: #1e2023;
+  --color-border: #2a2d31;
+}
+
+@layer base {
+  html, body {
+    @apply bg-surface text-gray-200 antialiased min-h-screen;
+  }
+
+  a {
+    @apply transition-colors duration-150;
+  }
+}

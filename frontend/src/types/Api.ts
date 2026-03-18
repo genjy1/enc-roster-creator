@@ -4,16 +4,18 @@ export interface Country {
   id: number
   name: string
   code: string // ISO 3166-1 alpha-2, e.g. "RU", "UA"
+  players: [Player] | null
 }
 
 export interface Player {
   id: number
-  nickname: string   // уникальный игровой псевдоним, e.g. "s1mple"
+  nickname: string // уникальный игровой псевдоним, e.g. "s1mple"
   name: string
   surname: string
   dateOfBirth: string // ISO 8601, e.g. "1995-06-15"
   position: string
   countryId: number
+  photo_url: string | undefined // URL фото с HLTV (img-cdn.hltv.org)
 }
 
 export interface Match {
@@ -27,8 +29,8 @@ export interface Match {
 export interface RosterEntry {
   id: number
   matchId: number
-  playerId: number
-  countryId: number
+  player_id: number
+  country_id: number
 }
 
 // ─── API response wrappers ────────────────────────────────────────────────────

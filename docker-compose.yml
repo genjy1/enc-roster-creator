@@ -74,6 +74,33 @@ services:
       retries: 10
     restart: unless-stopped
 
+  # ─── FlareSolverr (Cloudflare bypass) ────────────────────────────────────────
+  flaresolverr:
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    environment:
+      LOG_LEVEL: info
+    ports:
+      - "8191:8191"
+    profiles:
+      - scraper
+    restart: "no"
+
+  # ─── HLTV scraper ─────────────────────────────────────────────────────────────
+  scraper:
+    build:
+      context: ./scraper
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/storage/app:/scraper/output
+    environment:
+      OUTPUT_PATH: /scraper/output/players.json
+      FLARESOLVERR_URL: http://flaresolverr:8191
+    depends_on:
+      - flaresolverr
+    profiles:
+      - scraper
+    restart: "no"
+
   # ─── Redis 7 ──────────────────────────────────────────────────────────────────
   redis:
     image: redis:7-alpine

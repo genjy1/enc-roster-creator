@@ -19,6 +19,7 @@ class Player extends Model
         'surname',
         'date_of_birth',
         'position',
+        'photo_url',
     ];
 
     public function country(): BelongsTo

@@ -8,15 +8,15 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::table('players', function (Blueprint $table) {
-            $table->string('photo_url')->nullable()->after('position');
+        Schema::table('countries', function (Blueprint $table) {
+            $table->unique('code');
         });
     }
 
     public function down(): void
     {
-        Schema::table('players', function (Blueprint $table) {
-            $table->dropColumn('photo_url');
+        Schema::table('countries', function (Blueprint $table) {
+            $table->dropUnique(['code']);
         });
     }
 };

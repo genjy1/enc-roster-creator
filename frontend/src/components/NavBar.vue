@@ -1,24 +1,44 @@
 <template>
-  <header class="grid grid-cols-3 px-4 py-2 my-2">
-    <div class="logo"><RouterLink to="/">ENC</RouterLink></div>
-    <nav>
-      <ul class="flex justify-between">
-        <li><RouterLink to="/">Главная</RouterLink></li>
-        <li><RouterLink to="/players">Игроки</RouterLink></li>
-        <li><RouterLink to="/countries">Страны</RouterLink></li>
-        <li>
-          <RouterLink to="/matches" >Матчи</RouterLink>
-        </li>
+  <header class="sticky top-0 z-50 bg-card border-b border-border">
+    <div class="max-w-7xl mx-auto px-6 flex items-center justify-between h-14">
+      <!-- Logo -->
+      <RouterLink to="/" class="text-brand font-black text-xl tracking-widest uppercase">
+        ENC
+      </RouterLink>
 
-      </ul>
-    </nav>
-    <button class="hover:cursor-pointer">
-      <RouterLink to="/roster/add" dir="ltr" class="border p-2 rounded-s-lg">+</RouterLink>
-      <span dir="rtl" class="border-y border-r p-2 rounded-s-lg">Roster</span>
-    </button>
+      <!-- Navigation -->
+      <nav>
+        <ul class="flex items-center gap-6">
+          <li v-for="link in links" :key="link.to">
+            <RouterLink
+              :to="link.to"
+              class="text-sm text-gray-400 hover:text-white"
+              active-class="text-white font-semibold"
+            >
+              {{ link.label }}
+            </RouterLink>
+          </li>
+        </ul>
+      </nav>
+
+      <!-- CTA -->
+      <RouterLink
+        to="/roster/add"
+        class="flex items-center gap-2 bg-brand hover:bg-brand-hover text-white text-sm font-semibold px-4 py-1.5 rounded transition-colors"
+      >
+        <span>+</span>
+        <span>Roster</span>
+      </RouterLink>
+    </div>
   </header>
 </template>
-<script lang="ts">
 
-
+<script setup lang="ts">
+const links = [
+  { to: '/', label: 'Главная' },
+  { to: '/players', label: 'Игроки' },
+  { to: '/countries', label: 'Страны' },
+  { to: '/matches', label: 'Матчи' },
+  { to: '/rosters', label: 'Составы' },
+]
 </script>

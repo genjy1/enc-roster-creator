@@ -64,9 +64,11 @@ class ImportHltvPlayers extends Command
             } catch (RequestException $e) {
                 $status = $e->response->status();
                 $this->error("  HTTP {$status} on page {$page}. Check your ScraperAPI key or account credits.");
+
                 continue;
             } catch (ConnectionException $e) {
                 $this->error("  Connection failed for offset={$offset}: {$e->getMessage()}");
+
                 continue;
             }
 
@@ -74,6 +76,7 @@ class ImportHltvPlayers extends Command
 
             if (empty($players)) {
                 $this->warn("  No players parsed on page {$page} — HTML structure may have changed.");
+
                 continue;
             }
 
@@ -90,6 +93,7 @@ class ImportHltvPlayers extends Command
                         $playerData['position'],
                     ));
                     $totalImported++;
+
                     continue;
                 }
 
@@ -100,10 +104,11 @@ class ImportHltvPlayers extends Command
 
                 if ($countryId === null) {
                     $totalSkipped++;
+
                     continue;
                 }
 
-                $player = Player::firstOrCreate(
+                $player = Player::updateOrCreate(
                     ['nickname' => $playerData['nickname']],
                     [
                         'name' => $playerData['name'],
@@ -111,6 +116,7 @@ class ImportHltvPlayers extends Command
                         'date_of_birth' => $playerData['date_of_birth'],
                         'position' => $playerData['position'],
                         'country_id' => $countryId,
+                        'photo_url' => $playerData['photo_url'],
                     ],
                 );
 
@@ -141,8 +147,6 @@ class ImportHltvPlayers extends Command
             ->get(self::SCRAPER_API_URL, [
                 'api_key' => $apiKey,
                 'url' => $targetUrl,
-                'render' => 'true',   // execute JS so Cloudflare challenge resolves
-                'keep_headers' => 'true',
             ]);
 
         $response->throw();
@@ -151,11 +155,11 @@ class ImportHltvPlayers extends Command
     }
 
     /**
-     * @return list<array{nickname: string, name: string, surname: string, date_of_birth: string, position: string, country_name: string, country_code: string}>
+     * @return list<array{nickname: string, name: string, surname: string, date_of_birth: string, position: string, country_name: string, country_code: string, photo_url: string|null}>
      */
     private function parsePlayers(string $html): array
     {
-        $document = new DOMDocument();
+        $document = new DOMDocument;
 
         libxml_use_internal_errors(true);
         $document->loadHTML($html, LIBXML_NOWARNING | LIBXML_NOERROR);
@@ -164,54 +168,55 @@ class ImportHltvPlayers extends Command
         $xpath = new DOMXPath($document);
         $players = [];
 
-        $cards = $xpath->query('//*[contains(@class,"playerCard")]');
+        // Each player is an <a class="players-archive-box"> inside .players-archive-grid
+        $cards = $xpath->query('//*[contains(@class,"players-archive-box")]');
 
         if ($cards === false || $cards->length === 0) {
             return [];
         }
 
         foreach ($cards as $card) {
-            $nickname = $this->xpathText($xpath, './/*[contains(@class,"playerNickname")]', $card)
-                ?? $this->xpathText($xpath, './/*[contains(@class,"name")]', $card);
+            $nickname = $this->xpathText($xpath, './/*[contains(@class,"players-archive-nickname")]', $card);
 
             if ($nickname === null || $nickname === '') {
                 continue;
             }
 
-            $fullName = $this->xpathText($xpath, './/*[contains(@class,"playerRealname")]', $card)
-                ?? $this->xpathText($xpath, './/*[contains(@class,"playerName")]', $card)
-                ?? '';
-
+            $fullName = $this->xpathText($xpath, './/*[contains(@class,"players-archive-name")]', $card) ?? '';
             [$name, $surname] = $this->splitFullName($fullName);
 
             $countryName = '';
             $countryCode = '';
 
-            $flagImg = $xpath->query('.//*[contains(@class,"flag")]', $card);
+            $flagImg = $xpath->query('.//*[contains(@class,"players-archive-country")]//img[contains(@class,"flag")]', $card);
             if ($flagImg !== false && $flagImg->length > 0) {
                 $flag = $flagImg->item(0);
                 $countryName = $flag->getAttribute('title');
                 $src = $flag->getAttribute('src');
-                // src pattern: /img/static/flags/30x20/DK.gif
+                // src: /img/static/flags/30x20/BY.gif
                 if (preg_match('#/([A-Z]{2})\.(?:gif|png|svg|webp)#i', $src, $m)) {
                     $countryCode = strtoupper($m[1]);
                 }
             }
 
-            $position = $this->xpathText($xpath, './/*[contains(@class,"playerPosition")]', $card) ?? '';
-            $position = $this->normalizePosition($position);
+            // Photo: <img class="players-archive-bodyshot" src="https://img-cdn.hltv.org/...">
+            $photoUrl = null;
+            $photoImg = $xpath->query('.//*[contains(@class,"players-archive-bodyshot")]', $card);
+            if ($photoImg !== false && $photoImg->length > 0) {
+                $src = $photoImg->item(0)->getAttribute('src');
+                $photoUrl = $src !== '' ? $src : null;
+            }
 
-            $ageText = $this->xpathText($xpath, './/*[contains(@class,"playerAge")]', $card) ?? '';
-            $dateOfBirth = $this->ageToDateOfBirth($ageText);
-
+            // Position and age are not shown on the list page — use defaults
             $players[] = [
                 'nickname' => trim($nickname),
                 'name' => $name,
                 'surname' => $surname,
-                'date_of_birth' => $dateOfBirth,
-                'position' => $position,
+                'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
+                'position' => 'Rifler',
                 'country_name' => trim($countryName),
                 'country_code' => $countryCode,
+                'photo_url' => $photoUrl,
             ];
         }
 
@@ -219,7 +224,7 @@ class ImportHltvPlayers extends Command
     }
 
     /**
-     * @param \DOMNode $context
+     * @param  \DOMNode  $context
      */
     private function xpathText(DOMXPath $xpath, string $query, mixed $context): ?string
     {
@@ -243,38 +248,6 @@ class ImportHltvPlayers extends Command
             $parts[0] ?? '',
             $parts[1] ?? '',
         ];
-    }
-
-    private function normalizePosition(string $raw): string
-    {
-        $map = [
-            'awp'            => 'AWPer',
-            'sniper'         => 'AWPer',
-            'igl'            => 'IGL',
-            'in-game leader' => 'IGL',
-            'support'        => 'Support',
-            'lurk'           => 'Lurker',
-            'entry'          => 'Entry Fragger',
-            'rifle'          => 'Rifler',
-        ];
-
-        $lower = strtolower($raw);
-
-        foreach ($map as $keyword => $normalized) {
-            if (str_contains($lower, $keyword)) {
-                return $normalized;
-            }
-        }
-
-        return 'Rifler';
-    }
-
-    private function ageToDateOfBirth(string $ageText): string
-    {
-        preg_match('/\d+/', $ageText, $matches);
-        $age = isset($matches[0]) ? (int) $matches[0] : 22;
-
-        return now()->subYears($age)->format('Y-m-d');
     }
 
     private function resolveCountryId(string $countryName, string $countryCode): ?int

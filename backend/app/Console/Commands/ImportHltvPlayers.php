@@ -100,7 +100,6 @@ class ImportHltvPlayers extends Command
         $this->newLine();
 
         $totalImported = 0;
-        $totalSkipped = 0;
         $totalLetters = count($letters);
 
         foreach ($letters as $idx => $letter) {
@@ -152,24 +151,20 @@ class ImportHltvPlayers extends Command
                 );
 
                 if ($countryId === null) {
-                    $totalSkipped++;
-
                     continue;
                 }
 
-                $player = Player::updateOrCreate(
-                    ['nickname' => $playerData['nickname']],
-                    [
-                        'name'             => $playerData['name'],
-                        'surname'          => $playerData['surname'],
-                        'date_of_birth'    => $playerData['date_of_birth'],
-                        'primary_position' => $playerData['primary_position'],
-                        'country_id'       => $countryId,
-                        'photo_url'        => $playerData['photo_url'],
-                    ],
-                );
+                Player::create([
+                    'nickname' => $playerData['nickname'],
+                    'name' => $playerData['name'],
+                    'surname' => $playerData['surname'],
+                    'date_of_birth' => $playerData['date_of_birth'],
+                    'primary_position' => $playerData['primary_position'],
+                    'country_id' => $countryId,
+                    'photo_url' => $playerData['photo_url'],
+                ]);
 
-                $player->wasRecentlyCreated ? $totalImported++ : $totalSkipped++;
+                $totalImported++;
             }
 
             if (! $isDryRun) {
@@ -187,7 +182,7 @@ class ImportHltvPlayers extends Command
         if ($isDryRun) {
             $this->info("Dry-run done. Would import ~{$totalImported} player(s).");
         } else {
-            $this->info("Done. Imported: {$totalImported}, updated/skipped: {$totalSkipped}.");
+            $this->info("Done. Imported: {$totalImported} player(s).");
 
             $remaining = array_diff(self::LETTERS, $this->loadProgress()['done']);
             if (! empty($remaining)) {
@@ -208,7 +203,7 @@ class ImportHltvPlayers extends Command
         $response = Http::timeout(60)
             ->get(self::SCRAPER_API_URL, [
                 'api_key' => $apiKey,
-                'url'     => $targetUrl,
+                'url' => $targetUrl,
             ]);
 
         $response->throw();
@@ -267,14 +262,14 @@ class ImportHltvPlayers extends Command
             }
 
             $players[] = [
-                'nickname'         => trim($nickname),
-                'name'             => $name,
-                'surname'          => $surname,
-                'date_of_birth'    => now()->subYears(22)->format('Y-m-d'),
+                'nickname' => trim($nickname),
+                'name' => $name,
+                'surname' => $surname,
+                'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
                 'primary_position' => 'Rifler',
-                'country_name'     => trim($countryName),
-                'country_code'     => $countryCode,
-                'photo_url'        => $photoUrl,
+                'country_name' => trim($countryName),
+                'country_code' => $countryCode,
+                'photo_url' => $photoUrl,
             ];
         }
 

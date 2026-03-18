@@ -25,5 +25,7 @@ Route::get('/rosters', [CountryRosterController::class, 'list']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/matches', fn () => response()->json(['data' => []]));
     Route::post('/roster', [CountryRosterController::class, 'store']);
+    Route::get('/player/{player}', [PlayerController::class, 'show']);
+    Route::put('/player/{player}', [PlayerController::class, 'update']);
     Route::delete('/roster/{countryId}/player/{playerId}', [CountryRosterController::class, 'destroy']);
 });

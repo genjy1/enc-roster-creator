@@ -4,6 +4,7 @@ import { useUserStore } from '@/stores/userStore'
 export function useApi() {
   const loading = ref(false)
   const error = ref<string | null>(null)
+  const fieldErrors = ref<Record<string, string>>({})
   let controller: AbortController | null = null
 
   async function apiFetch<T>(url: string, options?: RequestInit): Promise<T | null> {
@@ -12,6 +13,7 @@ export function useApi() {
 
     loading.value = true
     error.value = null
+    fieldErrors.value = {}
 
     const store = useUserStore()
     const authHeader = store.token ? { Authorization: `Bearer ${store.token}` } : {}
@@ -29,10 +31,13 @@ export function useApi() {
 
       if (!response.ok) {
         const json = await response.json().catch(() => null)
-        const firstError = json?.errors
-          ? (Object.values(json.errors as Record<string, string[]>)[0][0] ?? json.message)
-          : (json?.message ?? `Ошибка сервера: ${response.status}`)
-        throw new Error(firstError)
+        if (json?.errors) {
+          fieldErrors.value = Object.fromEntries(
+            Object.entries(json.errors as Record<string, string[]>).map(([k, v]) => [k, v[0] ?? '']),
+          )
+          throw new Error(json.message ?? `Ошибка валидации`)
+        }
+        throw new Error(json?.message ?? `Ошибка сервера: ${response.status}`)
       }
 
       const json = await response.json()
@@ -48,5 +53,5 @@ export function useApi() {
 
   onUnmounted(() => controller?.abort())
 
-  return { loading, error, apiFetch }
+  return { loading, error, fieldErrors, apiFetch }
 }

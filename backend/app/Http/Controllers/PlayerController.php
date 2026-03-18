@@ -2,81 +2,54 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\UpdatePlayerRequest;
 use App\Models\Player;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 
 class PlayerController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index(): JsonResponse
     {
         $players = Player::query()
             ->with('country')
             ->orderBy('nickname')
             ->get()
-            ->map(fn (Player $player) => [
-                'id' => $player->id,
-                'nickname' => $player->nickname,
-                'name' => $player->name,
-                'surname' => $player->surname,
-                'date_of_birth' => $player->date_of_birth,
-                'position' => $player->position,
-                'photo_url' => $player->photo_url,
-                'country_code' => $player->country?->code,
-                'country_name' => $player->country?->name,
-            ]);
+            ->map(fn (Player $player) => $this->formatPlayer($player));
 
         return response()->json(['data' => $players]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
+    public function show(Player $player): JsonResponse
     {
-        //
+        $player->load('country');
+
+        return response()->json(['data' => $this->formatPlayer($player)]);
+    }
+
+    public function update(UpdatePlayerRequest $request, Player $player): JsonResponse
+    {
+        $player->update($request->validated());
+        $player->load('country');
+
+        return response()->json(['data' => $this->formatPlayer($player)]);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * @return array<string, mixed>
      */
-    public function store(Request $request)
+    private function formatPlayer(Player $player): array
     {
-        //
-    }
-
-    /**
-     * Display the specified resource.
-     */
-    public function show(Player $player)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Player $player)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Player $player)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Player $player)
-    {
-        //
+        return [
+            'id'           => $player->id,
+            'nickname'     => $player->nickname,
+            'name'         => $player->name,
+            'surname'      => $player->surname,
+            'date_of_birth' => $player->date_of_birth,
+            'position'     => $player->position,
+            'photo_url'    => $player->photo_url,
+            'country_id'   => $player->country_id,
+            'country_code' => $player->country?->code,
+            'country_name' => $player->country?->name,
+        ];
     }
 }

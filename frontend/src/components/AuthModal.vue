@@ -219,7 +219,7 @@ async function submit(): Promise<void> {
     if (!response.ok) {
       if (json.errors) {
         fieldErrors.value = Object.fromEntries(
-          Object.entries(json.errors as Record<string, string[]>).map(([k, v]) => [k, v[0]]),
+          Object.entries(json.errors as Record<string, string[]>).map(([k, v]) => [k, v[0] ?? '']),
         )
       } else {
         globalError.value = json.message ?? 'Ошибка сервера'
@@ -239,6 +239,8 @@ async function submit(): Promise<void> {
 </script>
 
 <style scoped>
+@reference '../main.css';
+
 .input-field {
   @apply w-full bg-surface border border-border text-gray-200 placeholder-gray-600
          rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-brand/50

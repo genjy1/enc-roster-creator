@@ -87,7 +87,7 @@ class ImportPlayersJson extends Command
                     'name' => $data['name'] ?? '',
                     'surname' => $data['surname'] ?? '',
                     'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
-                    'position' => 'Rifler',
+                    'primary_position' => 'Rifler',
                     'country_id' => $countryId,
                     'photo_url' => $data['photoUrl'] ?? null,
                 ],

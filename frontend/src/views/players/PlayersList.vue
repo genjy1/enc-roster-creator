@@ -73,14 +73,19 @@
         <div class="p-3 flex flex-col gap-1.5">
           <p class="font-bold text-brand truncate text-sm">{{ player.nickname }}</p>
           <p class="text-xs text-gray-500 truncate">{{ player.name }} {{ player.surname }}</p>
-          <span
-            :class="[
-              'text-xs font-medium px-2 py-0.5 rounded-full self-start',
-              positionBadge(player.position),
-            ]"
-          >
-            {{ player.position }}
-          </span>
+          <div class="flex flex-wrap gap-1">
+            <span
+              :class="['text-xs font-medium px-2 py-0.5 rounded-full', positionBadge(player.primary_position)]"
+            >
+              {{ player.primary_position }}
+            </span>
+            <span
+              v-if="player.secondary_position"
+              :class="['text-xs font-medium px-2 py-0.5 rounded-full opacity-70', positionBadge(player.secondary_position)]"
+            >
+              {{ player.secondary_position }}
+            </span>
+          </div>
         </div>
       </li>
     </ul>
@@ -110,11 +115,12 @@ const players = ref<Player[]>([])
 const search = ref('')
 const positionFilter = ref('')
 
-const positionOptions = computed<SelectOption[]>(() =>
-  [...new Set(players.value.map((p) => p.position).filter(Boolean))]
-    .sort()
-    .map((p) => ({ value: p, label: p })),
-)
+const positionOptions = computed<SelectOption[]>(() => {
+  const all = players.value.flatMap((p) =>
+    [p.primary_position, p.secondary_position].filter(Boolean),
+  )
+  return [...new Set(all)].sort().map((p) => ({ value: p, label: p }))
+})
 
 const filtered = computed<Player[]>(() => {
   const q = search.value.toLowerCase()
@@ -124,7 +130,10 @@ const filtered = computed<Player[]>(() => {
       p.nickname.toLowerCase().includes(q) ||
       p.name.toLowerCase().includes(q) ||
       p.surname.toLowerCase().includes(q)
-    const matchesPosition = !positionFilter.value || p.position === positionFilter.value
+    const matchesPosition =
+      !positionFilter.value ||
+      p.primary_position === positionFilter.value ||
+      p.secondary_position === positionFilter.value
     return matchesSearch && matchesPosition
   })
 })

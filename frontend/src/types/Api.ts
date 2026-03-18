@@ -15,7 +15,8 @@ export interface Player {
   name: string
   surname: string
   date_of_birth: string // ISO 8601
-  position: PlayerPosition
+  primary_position: PlayerPosition
+  secondary_position: PlayerPosition | null
   country_id: number
   country_code: string | null
   country_name: string | null

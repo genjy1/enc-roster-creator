@@ -26,12 +26,18 @@
       >
         <CheckIcon class="w-3.5 h-3.5" />
       </div>
-      <!-- Position badge overlaid on photo -->
-      <span
-        :class="['absolute bottom-2 left-2 text-xs font-semibold px-2 py-0.5 rounded-full', positionBadge]"
-      >
-        {{ player.position }}
-      </span>
+      <!-- Position badges overlaid on photo -->
+      <div class="absolute bottom-2 left-2 flex flex-wrap gap-1">
+        <span :class="['text-xs font-semibold px-2 py-0.5 rounded-full', primaryBadge]">
+          {{ player.primary_position }}
+        </span>
+        <span
+          v-if="player.secondary_position"
+          :class="['text-xs font-semibold px-2 py-0.5 rounded-full opacity-80', secondaryBadge]"
+        >
+          {{ player.secondary_position }}
+        </span>
+      </div>
     </div>
 
     <!-- Info -->
@@ -76,5 +82,6 @@ const emit = defineEmits<{
   toggle: [player: Player]
 }>()
 
-const positionBadge = computed(() => getBadge(props.player.position))
+const primaryBadge = computed(() => getBadge(props.player.primary_position))
+const secondaryBadge = computed(() => getBadge(props.player.secondary_position ?? 'Rifler'))
 </script>

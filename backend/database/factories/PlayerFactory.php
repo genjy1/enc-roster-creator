@@ -37,17 +37,18 @@ class PlayerFactory extends Factory
             'name' => fake()->firstName('male'),
             'surname' => fake()->lastName(),
             'date_of_birth' => fake()->dateTimeBetween('-28 years', '-18 years')->format('Y-m-d'),
-            'position' => fake()->randomElement(self::$positions),
+            'primary_position'   => fake()->randomElement(self::$positions),
+            'secondary_position' => fake()->optional(0.6)->randomElement(self::$positions),
         ];
     }
 
     /**
      * Set a specific position state.
      */
-    public function position(string $position): static
+    public function primaryPosition(string $position): static
     {
         return $this->state(fn (array $attributes) => [
-            'position' => $position,
+            'primary_position' => $position,
         ]);
     }
 }

@@ -90,7 +90,7 @@ class ImportHltvPlayers extends Command
                         $playerData['name'],
                         $playerData['surname'],
                         $playerData['country_name'],
-                        $playerData['position'],
+                        $playerData['primary_position'],
                     ));
                     $totalImported++;
 
@@ -114,7 +114,7 @@ class ImportHltvPlayers extends Command
                         'name' => $playerData['name'],
                         'surname' => $playerData['surname'],
                         'date_of_birth' => $playerData['date_of_birth'],
-                        'position' => $playerData['position'],
+                        'position' => $playerData['primary_position'],
                         'country_id' => $countryId,
                         'photo_url' => $playerData['photo_url'],
                     ],
@@ -213,7 +213,7 @@ class ImportHltvPlayers extends Command
                 'name' => $name,
                 'surname' => $surname,
                 'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
-                'position' => 'Rifler',
+                'primary_position' => 'Rifler',
                 'country_name' => trim($countryName),
                 'country_code' => $countryCode,
                 'photo_url' => $photoUrl,

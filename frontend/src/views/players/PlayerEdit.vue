@@ -67,14 +67,25 @@
               style="background: linear-gradient(to top, #0c0d0f, transparent)"
             />
             <div class="absolute bottom-3 left-3 right-3 flex items-end justify-between">
-              <span
-                :class="[
-                  'text-xs font-bold px-2.5 py-1 rounded-full',
-                  positionBadge(form.position || player.position),
-                ]"
-              >
-                {{ form.position || player.position }}
-              </span>
+              <div class="flex flex-wrap gap-1">
+                <span
+                  :class="[
+                    'text-xs font-bold px-2.5 py-1 rounded-full',
+                    positionBadge(form.primary_position || player.primary_position),
+                  ]"
+                >
+                  {{ form.primary_position || player.primary_position }}
+                </span>
+                <span
+                  v-if="form.secondary_position"
+                  :class="[
+                    'text-xs font-bold px-2 py-0.5 rounded-full opacity-80',
+                    positionBadge(form.secondary_position),
+                  ]"
+                >
+                  {{ form.secondary_position }}
+                </span>
+              </div>
               <span
                 v-if="player.country_code"
                 :class="[
@@ -139,36 +150,51 @@
             </p>
 
             <div>
-              <label class="field-label">Позиция</label>
+              <label class="field-label">Основная роль</label>
               <AppSelect
-                v-model="form.position"
+                v-model="form.primary_position"
                 :options="positionOptions"
-                placeholder="— Выбрать позицию —"
+                placeholder="— Выбрать роль —"
               >
                 <template #option="{ option }">
-                  <span
-                    :class="[
-                      'text-xs font-bold px-2 py-0.5 rounded-full',
-                      positionBadge(option.value),
-                    ]"
-                  >
+                  <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', positionBadge(option.value)]">
                     {{ option.label }}
                   </span>
                 </template>
                 <template #prefix="{ option }">
-                  <span
-                    v-if="option"
-                    :class="[
-                      'text-xs font-bold px-2 py-0.5 rounded-full',
-                      positionBadge(option.value),
-                    ]"
-                  >
+                  <span v-if="option" :class="['text-xs font-bold px-2 py-0.5 rounded-full', positionBadge(option.value)]">
                     {{ option.label }}
                   </span>
                 </template>
               </AppSelect>
-              <p v-if="fieldErrors.position" class="mt-1.5 text-xs text-red-400">
-                {{ fieldErrors.position }}
+              <p v-if="fieldErrors.primary_position" class="mt-1.5 text-xs text-red-400">
+                {{ fieldErrors.primary_position }}
+              </p>
+            </div>
+
+            <div>
+              <label class="field-label">
+                Второстепенная роль
+                <span class="text-gray-600 normal-case font-normal tracking-normal ml-1">(необязательно)</span>
+              </label>
+              <AppSelect
+                v-model="form.secondary_position"
+                :options="secondaryPositionOptions"
+                placeholder="— Без второй роли —"
+              >
+                <template #option="{ option }">
+                  <span :class="['text-xs font-bold px-2 py-0.5 rounded-full', positionBadge(option.value)]">
+                    {{ option.label }}
+                  </span>
+                </template>
+                <template #prefix="{ option }">
+                  <span v-if="option" :class="['text-xs font-bold px-2 py-0.5 rounded-full', positionBadge(option.value)]">
+                    {{ option.label }}
+                  </span>
+                </template>
+              </AppSelect>
+              <p v-if="fieldErrors.secondary_position" class="mt-1.5 text-xs text-red-400">
+                {{ fieldErrors.secondary_position }}
               </p>
             </div>
 
@@ -255,13 +281,19 @@ const form = ref({
   name: '',
   surname: '',
   date_of_birth: '',
-  position: '',
+  primary_position: '',
+  secondary_position: '',
   country_id: '',
   photo_url: '',
 })
 
 const positionOptions = computed<SelectOption[]>(() =>
   POSITIONS.map((p) => ({ value: p, label: p })),
+)
+
+// Secondary excludes the primary to prevent duplicates
+const secondaryPositionOptions = computed<SelectOption[]>(() =>
+  POSITIONS.filter((p) => p !== form.value.primary_position).map((p) => ({ value: p, label: p })),
 )
 
 const countryOptions = computed<SelectOption[]>(() =>
@@ -274,7 +306,8 @@ function populateForm(p: Player): void {
     name: p.name,
     surname: p.surname,
     date_of_birth: p.date_of_birth ?? '',
-    position: p.position,
+    primary_position: p.primary_position,
+    secondary_position: p.secondary_position ?? '',
     country_id: p.country_code ?? '',
     photo_url: p.photo_url ?? '',
   }
@@ -295,7 +328,8 @@ async function save(): Promise<void> {
       name: form.value.name,
       surname: form.value.surname,
       date_of_birth: form.value.date_of_birth,
-      position: form.value.position,
+      primary_position: form.value.primary_position,
+      secondary_position: form.value.secondary_position || null,
       country_id: country?.id,
       photo_url: form.value.photo_url || null,
     }),

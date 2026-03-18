@@ -18,7 +18,8 @@ class Player extends Model
         'name',
         'surname',
         'date_of_birth',
-        'position',
+        'primary_position',
+        'secondary_position',
         'photo_url',
     ];
 

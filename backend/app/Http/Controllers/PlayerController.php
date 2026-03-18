@@ -40,16 +40,17 @@ class PlayerController extends Controller
     private function formatPlayer(Player $player): array
     {
         return [
-            'id'           => $player->id,
-            'nickname'     => $player->nickname,
-            'name'         => $player->name,
-            'surname'      => $player->surname,
-            'date_of_birth' => $player->date_of_birth,
-            'position'     => $player->position,
-            'photo_url'    => $player->photo_url,
-            'country_id'   => $player->country_id,
-            'country_code' => $player->country?->code,
-            'country_name' => $player->country?->name,
+            'id'                 => $player->id,
+            'nickname'           => $player->nickname,
+            'name'               => $player->name,
+            'surname'            => $player->surname,
+            'date_of_birth'      => $player->date_of_birth,
+            'primary_position'   => $player->primary_position,
+            'secondary_position' => $player->secondary_position,
+            'photo_url'          => $player->photo_url,
+            'country_id'         => $player->country_id,
+            'country_code'       => $player->country?->code,
+            'country_name'       => $player->country?->name,
         ];
     }
 }

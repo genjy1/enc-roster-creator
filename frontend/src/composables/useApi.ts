@@ -1,4 +1,5 @@
 import { onUnmounted, ref } from 'vue'
+import { useUserStore } from '@/stores/userStore'
 
 export function useApi() {
   const loading = ref(false)
@@ -12,12 +13,16 @@ export function useApi() {
     loading.value = true
     error.value = null
 
+    const store = useUserStore()
+    const authHeader = store.token ? { Authorization: `Bearer ${store.token}` } : {}
+
     try {
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
         headers: {
           Accept: 'application/json',
+          ...authHeader,
           ...options?.headers,
         },
       })

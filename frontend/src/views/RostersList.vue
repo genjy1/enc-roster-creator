@@ -20,7 +20,9 @@
     <div v-else-if="error" class="text-red-400 py-10 text-center">{{ error }}</div>
 
     <div v-else-if="!rosters.length" class="text-center py-20 text-gray-600">
-      <p class="text-4xl mb-3">📋</p>
+      <div class="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+        <ClipboardDocumentListIcon class="w-8 h-8 text-gray-600" />
+      </div>
       <p class="mb-2">Ростеры ещё не созданы.</p>
       <RouterLink to="/roster/add" class="text-brand hover:underline text-sm">Создать первый</RouterLink>
     </div>
@@ -99,6 +101,7 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
+import { ClipboardDocumentListIcon } from '@heroicons/vue/24/outline'
 import type { RosterGroup } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
 import { positionBadge } from '@/utils/positionBadge'

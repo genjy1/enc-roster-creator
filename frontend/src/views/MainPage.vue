@@ -53,8 +53,8 @@
   <section class="border-t border-border">
     <div class="max-w-7xl mx-auto px-6 py-16 grid sm:grid-cols-3 gap-8">
       <div v-for="feat in features" :key="feat.title" class="flex flex-col gap-3">
-        <div class="w-10 h-10 rounded-lg bg-brand-dim border border-brand/20 flex items-center justify-center text-brand text-xl">
-          {{ feat.icon }}
+        <div class="w-10 h-10 rounded-lg bg-brand-dim border border-brand/20 flex items-center justify-center text-brand">
+          <component :is="feat.icon" class="w-5 h-5" />
         </div>
         <h3 class="font-bold text-white">{{ feat.title }}</h3>
         <p class="text-sm text-gray-500 leading-relaxed">{{ feat.desc }}</p>
@@ -64,6 +64,8 @@
 </template>
 
 <script setup lang="ts">
+import { BoltIcon, FunnelIcon, GlobeEuropeAfricaIcon } from '@heroicons/vue/24/outline'
+
 const stats = [
   { value: '24+', label: 'Страны' },
   { value: '300+', label: 'Игроки' },
@@ -72,17 +74,17 @@ const stats = [
 
 const features = [
   {
-    icon: '🌍',
+    icon: GlobeEuropeAfricaIcon,
     title: 'Все страны ENC',
     desc: 'База всех европейских стран с флагами и списком профессиональных игроков.',
   },
   {
-    icon: '🎯',
+    icon: FunnelIcon,
     title: 'Умный подбор',
     desc: 'Фильтрация по позициям — AWP, IGL, Rifler, Support, Lurker — для идеального баланса команды.',
   },
   {
-    icon: '⚡',
+    icon: BoltIcon,
     title: 'Мгновенное сохранение',
     desc: 'Сформируй ростер в несколько кликов и сохрани за одно нажатие.',
   },

@@ -91,7 +91,9 @@
     </ul>
 
     <div v-else class="text-center py-20 text-gray-600">
-      <p class="text-4xl mb-3">🔍</p>
+      <div class="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center mx-auto mb-4">
+        <MagnifyingGlassIcon class="w-8 h-8 text-gray-600" />
+      </div>
       <p>Игроки не найдены</p>
     </div>
   </div>
@@ -99,6 +101,7 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { MagnifyingGlassIcon } from '@heroicons/vue/24/outline'
 import type { Player } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
 import { resolvePhoto } from '@/utils/resolvePhoto'

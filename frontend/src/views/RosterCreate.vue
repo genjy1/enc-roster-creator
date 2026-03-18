@@ -113,8 +113,8 @@
             v-if="selectedCode && !countryPlayers.length"
             class="flex flex-col items-center justify-center gap-4 py-24 text-center"
           >
-            <div class="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center text-3xl opacity-50">
-              🎮
+            <div class="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center opacity-50">
+              <UserGroupIcon class="w-8 h-8 text-gray-500" />
             </div>
             <p class="text-gray-500 text-sm">Нет игроков для этой страны.</p>
           </div>
@@ -126,8 +126,8 @@
             v-if="!selectedCode"
             class="flex flex-col items-center justify-center gap-4 py-24 text-center"
           >
-            <div class="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center text-3xl opacity-40">
-              🌍
+            <div class="w-16 h-16 rounded-2xl bg-card border border-border flex items-center justify-center opacity-40">
+              <GlobeEuropeAfricaIcon class="w-8 h-8 text-gray-500" />
             </div>
             <p class="text-gray-600 text-sm">Выберите страну, чтобы увидеть игроков</p>
           </div>
@@ -208,7 +208,7 @@
               v-if="saving"
               class="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin"
             />
-            <span v-else class="text-base leading-none">💾</span>
+            <CloudArrowUpIcon v-else class="w-4 h-4" />
             {{ saving ? 'Сохранение…' : 'Сохранить ростер' }}
           </button>
         </div>
@@ -220,6 +220,7 @@
 
 <script lang="ts" setup>
 import { computed, onMounted, ref } from 'vue'
+import { CloudArrowUpIcon, GlobeEuropeAfricaIcon, UserGroupIcon } from '@heroicons/vue/24/outline'
 import type { Country, Player } from '@/types/Api'
 import { useApi } from '@/composables/useApi'
 import { resolvePhoto } from '@/utils/resolvePhoto'

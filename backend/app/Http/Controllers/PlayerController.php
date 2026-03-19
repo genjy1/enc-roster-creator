@@ -11,6 +11,7 @@ class PlayerController extends Controller
     public function index(): JsonResponse
     {
         $players = Player::query()
+            ->distinct('nickname')
             ->with('country')
             ->orderBy('nickname')
             ->get()

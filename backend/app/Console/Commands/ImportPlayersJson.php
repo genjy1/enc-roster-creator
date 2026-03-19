@@ -47,7 +47,6 @@ class ImportPlayersJson extends Command
         }
 
         $imported = 0;
-        $skipped = 0;
 
         foreach ($players as $data) {
             $nickname = trim($data['nickname'] ?? '');
@@ -76,24 +75,20 @@ class ImportPlayersJson extends Command
             );
 
             if ($countryId === null) {
-                $skipped++;
-
                 continue;
             }
 
-            $player = Player::updateOrCreate(
-                ['nickname' => $nickname],
-                [
-                    'name' => $data['name'] ?? '',
-                    'surname' => $data['surname'] ?? '',
-                    'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
-                    'primary_position' => 'Rifler',
-                    'country_id' => $countryId,
-                    'photo_url' => $data['photoUrl'] ?? null,
-                ],
-            );
+            Player::create([
+                'nickname' => $nickname,
+                'name' => $data['name'] ?? '',
+                'surname' => $data['surname'] ?? '',
+                'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
+                'primary_position' => 'Rifler',
+                'country_id' => $countryId,
+                'photo_url' => $data['photoUrl'] ?? null,
+            ]);
 
-            $player->wasRecentlyCreated ? $imported++ : $skipped++;
+            $imported++;
         }
 
         $this->newLine();
@@ -101,7 +96,7 @@ class ImportPlayersJson extends Command
         if ($isDryRun) {
             $this->info("Dry-run complete. Would import {$imported} player(s).");
         } else {
-            $this->info("Import complete. Imported: {$imported}, skipped (already exist): {$skipped}.");
+            $this->info("Import complete. Imported: {$imported} player(s).");
         }
 
         return self::SUCCESS;

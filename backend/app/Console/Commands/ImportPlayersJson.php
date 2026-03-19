@@ -78,17 +78,21 @@ class ImportPlayersJson extends Command
                 continue;
             }
 
-            Player::create([
-                'nickname' => $nickname,
-                'name' => $data['name'] ?? '',
-                'surname' => $data['surname'] ?? '',
-                'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
-                'primary_position' => 'Rifler',
-                'country_id' => $countryId,
-                'photo_url' => $data['photoUrl'] ?? null,
-            ]);
+            $player = Player::firstOrCreate(
+                ['nickname' => $nickname],
+                [
+                    'name' => $data['name'] ?? '',
+                    'surname' => $data['surname'] ?? '',
+                    'date_of_birth' => now()->subYears(22)->format('Y-m-d'),
+                    'primary_position' => 'Rifler',
+                    'country_id' => $countryId,
+                    'photo_url' => $data['photoUrl'] ?? null,
+                ],
+            );
 
-            $imported++;
+            if ($player->wasRecentlyCreated) {
+                $imported++;
+            }
         }
 
         $this->newLine();
@@ -96,7 +100,7 @@ class ImportPlayersJson extends Command
         if ($isDryRun) {
             $this->info("Dry-run complete. Would import {$imported} player(s).");
         } else {
-            $this->info("Import complete. Imported: {$imported} player(s).");
+            $this->info("Import complete. Created: {$imported} new player(s).");
         }
 
         return self::SUCCESS;

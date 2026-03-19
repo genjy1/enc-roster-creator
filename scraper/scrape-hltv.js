@@ -16,7 +16,7 @@ const OUTPUT_PATH      = process.env.OUTPUT_PATH
 const PROGRESS_PATH    = resolve(dirname(OUTPUT_PATH), 'hltv_scrape_progress.json');
 
 const LETTERS = [
-  '#', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
+  'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I',
   'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
   'T', 'U', 'V', 'W', 'X', 'Y', 'Z',
 ];
@@ -45,8 +45,14 @@ function saveProgress(progress) {
 }
 
 function saveOutput(players) {
+  // Deduplicate by nickname (case-sensitive) keeping the last occurrence
+  const seen = new Map();
+  for (const p of players) seen.set(p.nickname, p);
+  const unique = [...seen.values()];
+
   mkdirSync(dirname(OUTPUT_PATH), { recursive: true });
-  writeFileSync(OUTPUT_PATH, JSON.stringify(players, null, 2), 'utf8');
+  writeFileSync(OUTPUT_PATH, JSON.stringify(unique, null, 2), 'utf8');
+  return unique.length;
 }
 
 function loadExistingPlayers() {
@@ -197,10 +203,11 @@ async function scrape() {
     allPlayers.push(...found);
     console.log(`  «${letter}» done: ${found.length} players. Total: ${allPlayers.length}.`);
 
-    // Mark letter complete and flush to disk
+    // Mark letter complete and flush to disk (deduplicated)
     if (!progress.done.includes(letter)) progress.done.push(letter);
     saveProgress(progress);
-    saveOutput(allPlayers);
+    const uniqueCount = saveOutput(allPlayers);
+    console.log(`  Saved ${uniqueCount} unique players to file.`);
 
     if (i < letters.length - 1) {
       console.log(`  Waiting ${PAGE_DELAY_MS}ms before next letter…`);
@@ -208,7 +215,8 @@ async function scrape() {
     }
   }
 
-  console.log(`\n✓ Done. ${allPlayers.length} total players → ${OUTPUT_PATH}`);
+  const finalCount = saveOutput(allPlayers);
+  console.log(`\n✓ Done. ${finalCount} unique players → ${OUTPUT_PATH}`);
 
   const remaining = LETTERS.filter(l => !progress.done.includes(l));
   if (remaining.length > 0) {
